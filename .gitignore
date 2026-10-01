@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+client/node_modules
+
+# Production builds
+dist
+client/dist
+dist-ssr
+*.local
+
+# SQLite temporary journal files
+server/data/school.db-wal
+server/data/school.db-shm
+server/data/school.db-journal
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS and Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Vercel deployment cache
+.vercel
