@@ -253,7 +253,7 @@ export default function CampusStore() {
         </div>
 
         {/* Item Cards Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3.5 overflow-y-auto max-h-[calc(100vh-250px)] pr-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5 overflow-y-auto max-h-[calc(100vh-250px)] pr-1">
           {filteredItems.map(item => {
             const theme = getCategoryTheme(item.category);
             const inCart = cart.find(c => c.itemId === item.id);
@@ -261,22 +261,28 @@ export default function CampusStore() {
               <div 
                 key={item.id} 
                 onClick={() => addToCart(item)}
-                className={`relative p-4 rounded-xl border-2 cursor-pointer shadow-2xs hover:shadow-md transition-all active:scale-97 flex flex-col justify-between h-36 ${theme.bg} ${theme.border} ${theme.hover} bg-white`}
+                className={`relative p-3 sm:p-4 rounded-xl border-2 cursor-pointer shadow-2xs hover:shadow-md transition-all active:scale-97 flex flex-col justify-between min-h-[150px] sm:min-h-[160px] ${theme.bg} ${theme.border} ${theme.hover} bg-white overflow-hidden`}
               >
                 {inCart && (
-                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-scale">
+                  <span className="absolute top-2 right-2 bg-blue-600 text-white font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-scale z-10">
                     {inCart.quantity}
                   </span>
                 )}
-                <div>
-                  <div className="font-semibold text-slate-800 text-base leading-snug">{item.name}</div>
-                  <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-md mt-1.5 ${theme.tag}`}>
+                <div className="min-w-0 pr-4">
+                  <div className="font-semibold text-slate-800 text-xs sm:text-sm md:text-base leading-snug line-clamp-2" title={item.name}>
+                    {item.name}
+                  </div>
+                  <span className={`inline-block text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md mt-1.5 ${theme.tag}`}>
                     {item.category}
                   </span>
                 </div>
-                <div className="flex justify-between items-end mt-2 pt-2 border-t border-slate-100/80">
-                  <span className="text-xs text-slate-400 font-medium">Stock: {item.stock || 100}</span>
-                  <span className="font-bold text-lg text-slate-900">₹{item.price}</span>
+                <div className="flex flex-wrap items-end justify-between gap-1 mt-3 pt-2 border-t border-slate-100/80">
+                  <span className="text-[11px] sm:text-xs text-slate-400 font-medium whitespace-nowrap">
+                    Stock: {item.stock || 100}
+                  </span>
+                  <span className="font-bold text-base sm:text-lg text-slate-900 leading-none whitespace-nowrap">
+                    ₹{item.price}
+                  </span>
                 </div>
               </div>
             );
