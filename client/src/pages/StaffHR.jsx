@@ -5,7 +5,7 @@ import {
   XCircle, Clock, Building2, Sparkles, Eye, UserCheck, ShieldCheck
 } from 'lucide-react';
 
-export default function StaffHR() {
+export default function StaffHR({ initialParams = {} }) {
   const [staff, setStaff] = useState([]);
   const [stats, setStats] = useState(null);
   const [leaves, setLeaves] = useState([]);
@@ -14,9 +14,16 @@ export default function StaffHR() {
 
   // Tabs & Filters
   const [activeTab, setActiveTab] = useState('directory'); // 'directory' | 'leaves' | 'substitutes' | 'departments'
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialParams?.staffId || '');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [leaveFilter, setLeaveFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'
+
+  useEffect(() => {
+    if (initialParams?.staffId) {
+      setSearchQuery(initialParams.staffId);
+      setActiveTab('directory');
+    }
+  }, [initialParams?.staffId]);
 
   // Modals
   const [showOnboardModal, setShowOnboardModal] = useState(false);

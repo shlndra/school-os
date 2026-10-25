@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   UserPlus, 
@@ -8,11 +8,12 @@ import {
   Users, 
   CircleDollarSign, 
   ShieldCheck, 
-  Smartphone,
-  FileCheck2,
-  Menu,
-  X,
-  Sparkles
+  Smartphone, 
+  FileCheck2, 
+  Menu, 
+  X, 
+  Sparkles,
+  Search
 } from 'lucide-react';
 
 import Dashboard from './pages/Dashboard';
@@ -25,10 +26,38 @@ import Payroll from './pages/Payroll';
 import CampusSafety from './pages/CampusSafety';
 import ParentApp from './pages/ParentApp';
 import TransferCertificate from './pages/TransferCertificate';
+import GlobalSearchModal from './components/GlobalSearchModal';
+
+const DEV_PERSONAS = [
+  { id: 'STF-001', name: 'Meera Iyer', role: 'Principal', token: 'dev-token-principal-meera' },
+  { id: 'STF-003', name: 'Sunita Devi', role: 'Teacher', token: 'dev-token-teacher-sunita' },
+  { id: 'STF-007', name: 'Anita Sharma', role: 'Accountant', token: 'dev-token-accountant-anita' },
+  { id: 'STF-011', name: 'Deepak Gupta', role: 'Librarian', token: 'dev-token-librarian-deepak' },
+];
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [navParams, setNavParams] = useState(null);
+  const [activePersona, setActivePersona] = useState(DEV_PERSONAS[0]);
+
+  // Global keyboard shortcut: Cmd+K / Ctrl+K
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchModalOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleGlobalNavigate = (page, params) => {
+    setCurrentPage(page);
+    setNavParams(params);
+  };
 
   const navItems = [
     { id: 'dashboard', label: 'Central Command Hub', badge: 'Pulse', icon: LayoutDashboard },
@@ -45,18 +74,18 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'dashboard': return <Dashboard onNavigate={(page) => setCurrentPage(page)} />;
-      case 'admissions': return <Admissions />;
-      case 'classroom': return <Classroom />;
-      case 'fees': return <Fees />;
-      case 'store': return <CampusStore />;
-      case 'staff': return <StaffHR />;
+      case 'dashboard': return <Dashboard onNavigate={(page) => { setNavParams(null); setCurrentPage(page); }} />;
+      case 'admissions': return <Admissions initialParams={navParams} />;
+      case 'classroom': return <Classroom initialParams={navParams} />;
+      case 'fees': return <Fees initialParams={navParams} />;
+      case 'store': return <CampusStore initialParams={navParams} />;
+      case 'staff': return <StaffHR initialParams={navParams} />;
       case 'payroll': return <Payroll />;
       case 'safety': return <CampusSafety />;
       case 'transport': return <CampusSafety />; // backwards compatibility with older dashboard links
       case 'parent_app': return <ParentApp />;
       case 'tc': return <TransferCertificate />;
-      default: return <Dashboard onNavigate={(page) => setCurrentPage(page)} />;
+      default: return <Dashboard onNavigate={(page) => { setNavParams(null); setCurrentPage(page); }} />;
     }
   };
 
@@ -160,10 +189,59 @@ export default function App() {
 
       {/* Main App Workspace */}
       <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+        {/* Institutional Top Application Bar */}
+        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-slate-200 px-4 sm:px-8 py-3 flex items-center justify-between gap-4 shadow-2xs">
+          {/* Global Search Quick Trigger */}
+          <button
+            onClick={() => setSearchModalOpen(true)}
+            className="flex items-center gap-3 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-500 hover:text-slate-800 border border-slate-200/80 transition-all text-xs sm:text-sm font-medium w-full max-w-md text-left shadow-2xs group cursor-pointer"
+          >
+            <Search size={16} className="text-slate-400 group-hover:text-blue-600 transition-colors shrink-0" />
+            <span className="flex-1 truncate">Search students, staff, fees, admissions, store...</span>
+            <div className="flex items-center gap-0.5 text-[11px] font-semibold text-slate-400 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-2xs shrink-0">
+              <kbd>⌘</kbd>
+              <kbd>K</kbd>
+            </div>
+          </button>
+
+          {/* Local Development RBAC Persona Switcher */}
+          {import.meta.env.MODE !== 'production' && (
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 hidden lg:inline">
+                Actor:
+              </span>
+              <select
+                value={activePersona.id}
+                onChange={(e) => {
+                  const found = DEV_PERSONAS.find(p => p.id === e.target.value);
+                  if (found) setActivePersona(found);
+                }}
+                className="text-xs font-bold text-slate-700 bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
+                title="Switch Active Actor Persona (Development Authentication)"
+              >
+                {DEV_PERSONAS.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.role})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </header>
+
         <div className="flex-1 p-4 sm:p-6 lg:p-8 bg-slate-50 max-w-7xl w-full mx-auto">
           {renderPage()}
         </div>
       </main>
+
+      {/* Global Search Modal */}
+      <GlobalSearchModal
+        isOpen={searchModalOpen}
+        onClose={() => setSearchModalOpen(false)}
+        token={activePersona.token}
+        activePersona={activePersona}
+        onNavigate={handleGlobalNavigate}
+      />
     </div>
   );
 }

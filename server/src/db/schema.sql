@@ -408,3 +408,14 @@ CREATE INDEX IF NOT EXISTS idx_admissions_id_nocase ON admissions(id COLLATE NOC
 CREATE INDEX IF NOT EXISTS idx_pos_items_name_nocase ON pos_items(name COLLATE NOCASE);
 CREATE INDEX IF NOT EXISTS idx_pos_items_active_cat ON pos_items(is_active, category);
 
+-- Authentication Sessions & Verified Server-Side Identity
+CREATE TABLE IF NOT EXISTS auth_sessions (
+  token TEXT PRIMARY KEY,
+  staff_id TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  expires_at TEXT NOT NULL,
+  FOREIGN KEY (staff_id) REFERENCES staff(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_token_exp ON auth_sessions(token, expires_at);
+

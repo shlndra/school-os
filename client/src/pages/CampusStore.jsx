@@ -14,14 +14,20 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-export default function CampusStore() {
+export default function CampusStore({ initialParams = {} }) {
   const [items, setItems] = useState([]);
   const [students, setStudents] = useState([]);
   const [cart, setCart] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState('');
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [rechargeAmount, setRechargeAmount] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialParams?.itemId || '');
+
+  useEffect(() => {
+    if (initialParams?.itemId) {
+      setSearchQuery(initialParams.itemId);
+    }
+  }, [initialParams?.itemId]);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [addingItem, setAddingItem] = useState(false);
   const [newItem, setNewItem] = useState({ name: '', category: 'FOOD', price: '', stock: 100 });

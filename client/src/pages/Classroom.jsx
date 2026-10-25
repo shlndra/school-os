@@ -21,8 +21,14 @@ import {
   Sparkles
 } from 'lucide-react';
 
-export default function Classroom() {
-  const [activeTab, setActiveTab] = useState('attendance');
+export default function Classroom({ initialParams = {} }) {
+  const [activeTab, setActiveTab] = useState(initialParams?.studentId ? 'report_card' : 'attendance');
+
+  useEffect(() => {
+    if (initialParams?.studentId) {
+      setActiveTab('report_card');
+    }
+  }, [initialParams?.studentId]);
   
   return (
     <div className="space-y-6 pb-8">
@@ -95,7 +101,7 @@ export default function Classroom() {
       {activeTab === 'attendance' && <AttendanceTab />}
       {activeTab === 'timetable' && <TimetableTab />}
       {activeTab === 'marks' && <MarksTab />}
-      {activeTab === 'report_card' && <ReportCardTab />}
+      {activeTab === 'report_card' && <ReportCardTab initialStudentId={initialParams?.studentId} />}
     </div>
   );
 }
@@ -957,10 +963,10 @@ function MarksTab() {
 // -------------------------------------------------------------
 // TAB 4: CBSE OFFICIAL REPORT CARDS & TRANSCRIPTS
 // -------------------------------------------------------------
-function ReportCardTab() {
+function ReportCardTab({ initialStudentId }) {
   const [students, setStudents] = useState([]);
   const [selectedGrade, setSelectedGrade] = useState('ALL');
-  const [selectedStudentId, setSelectedStudentId] = useState('');
+  const [selectedStudentId, setSelectedStudentId] = useState(initialStudentId || '');
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -977,8 +983,11 @@ function ReportCardTab() {
         const list = Array.isArray(data) ? data : [];
         setStudents(list);
         if (list.length > 0) {
-          setSelectedStudentId(list[0].id);
-          fetchReportCard(list[0].id);
+          const targetId = (initialStudentId && list.some(s => s.id === initialStudentId))
+            ? initialStudentId
+            : list[0].id;
+          setSelectedStudentId(targetId);
+          fetchReportCard(targetId);
         }
       })
       .catch(err => {

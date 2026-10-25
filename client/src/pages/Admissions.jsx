@@ -17,8 +17,14 @@ import {
   Check
 } from 'lucide-react';
 
-export default function Admissions() {
+export default function Admissions({ initialParams = {} }) {
   const [activeTab, setActiveTab] = useState('pipeline'); // 'pipeline' | 'id_cards'
+
+  useEffect(() => {
+    if (initialParams?.applicantId) {
+      setActiveTab('pipeline');
+    }
+  }, [initialParams?.applicantId]);
 
   return (
     <div className="space-y-6 pb-8">
@@ -61,7 +67,7 @@ export default function Admissions() {
         </div>
       </div>
 
-      {activeTab === 'pipeline' ? <PipelineTab /> : <IdCardStudioTab />}
+      {activeTab === 'pipeline' ? <PipelineTab initialApplicantId={initialParams?.applicantId} /> : <IdCardStudioTab />}
     </div>
   );
 }
@@ -69,7 +75,7 @@ export default function Admissions() {
 // -------------------------------------------------------------
 // TAB 1: ADMISSIONS PIPELINE (KANBAN)
 // -------------------------------------------------------------
-function PipelineTab() {
+function PipelineTab({ initialApplicantId }) {
   const [admissions, setAdmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -100,6 +106,17 @@ function PipelineTab() {
   useEffect(() => {
     fetchAdmissions();
   }, []);
+
+  useEffect(() => {
+    if (initialApplicantId && admissions.length > 0) {
+      setTimeout(() => {
+        const el = document.getElementById(`adm-card-${initialApplicantId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  }, [initialApplicantId, admissions]);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -229,8 +246,18 @@ function PipelineTab() {
                     const guardian = adm.guardian_name || adm.guardianName || 'Guardian';
                     const phone = adm.guardian_phone || adm.parentContact;
 
+                    const isHighlighted = initialApplicantId && adm.id === initialApplicantId;
+
                     return (
-                      <div key={adm.id} className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs hover:shadow-sm transition-all space-y-2">
+                      <div 
+                        key={adm.id} 
+                        id={`adm-card-${adm.id}`}
+                        className={`p-3.5 rounded-xl border transition-all space-y-2 ${
+                          isHighlighted
+                            ? 'bg-blue-50/70 border-blue-400 ring-2 ring-blue-500 shadow-md'
+                            : 'bg-white border-slate-200 shadow-2xs hover:shadow-sm'
+                        }`}
+                      >
                         <div className="flex items-start justify-between">
                           <h4 className="font-bold text-slate-800 text-xs leading-snug">{applicantName}</h4>
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700">

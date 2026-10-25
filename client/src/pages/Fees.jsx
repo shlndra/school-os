@@ -19,7 +19,7 @@ import {
   User
 } from 'lucide-react';
 
-export default function Fees() {
+export default function Fees({ initialParams = {} }) {
   const [activeTab, setActiveTab] = useState('invoices');
   const [invoices, setInvoices] = useState([]);
   const [stats, setStats] = useState(null);
@@ -35,7 +35,14 @@ export default function Fees() {
 
   // Filter & Search states
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialParams?.invoiceId || '');
+
+  useEffect(() => {
+    if (initialParams?.invoiceId) {
+      setSearchQuery(initialParams.invoiceId);
+      setActiveTab('invoices');
+    }
+  }, [initialParams?.invoiceId]);
 
   // Payment Form State
   const [payAmount, setPayAmount] = useState('');
