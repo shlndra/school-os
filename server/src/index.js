@@ -5,6 +5,7 @@ const { getDb } = require('./db/database');
 const LedgerService = require('./services/ledgerService');
 const PayrollService = require('./services/payrollService');
 const TCService = require('./services/tcService');
+const SearchService = require('./services/searchService');
 
 const dashboardRoutes = require('./routes/dashboard');
 const studentsRoutes = require('./routes/students');
@@ -18,6 +19,7 @@ const transportRoutes = require('./routes/transport');
 const tcRoutes = require('./routes/tc');
 const safetyRoutes = require('./routes/safetyClinic');
 const noticesRoutes = require('./routes/notices');
+const searchRoutes = require('./routes/search');
 
 const app = express();
 const port = 3001;
@@ -30,11 +32,13 @@ const db = getDb();
 const ledgerService = new LedgerService(db);
 const payrollService = new PayrollService(db);
 const tcService = new TCService(db);
+const searchService = new SearchService(db);
 
 app.locals.db = db;
 app.locals.ledgerService = ledgerService;
 app.locals.payrollService = payrollService;
 app.locals.tcService = tcService;
+app.locals.searchService = searchService;
 
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/students', studentsRoutes);
@@ -48,6 +52,7 @@ app.use('/api/transport', transportRoutes);
 app.use('/api/tc', tcRoutes);
 app.use('/api/safety', safetyRoutes);
 app.use('/api/notices', noticesRoutes);
+app.use('/api/search', searchRoutes);
 
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);

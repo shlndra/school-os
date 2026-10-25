@@ -388,3 +388,23 @@ CREATE TABLE IF NOT EXISTS circulars_notices (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Search & Performance Expression Indexes (Prefix Optimization)
+CREATE INDEX IF NOT EXISTS idx_students_first_name_nocase ON students(first_name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_students_last_name_nocase ON students(last_name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_students_id_nocase ON students(id COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_students_status_grade ON students(status, grade, section);
+
+CREATE INDEX IF NOT EXISTS idx_staff_first_name_nocase ON staff(first_name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_staff_last_name_nocase ON staff(last_name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_staff_id_nocase ON staff(id COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_staff_dept_role ON staff(status, department, role);
+
+CREATE INDEX IF NOT EXISTS idx_fee_invoices_student_status ON fee_invoices(student_id, status);
+CREATE INDEX IF NOT EXISTS idx_fee_invoices_id_nocase ON fee_invoices(id COLLATE NOCASE);
+
+CREATE INDEX IF NOT EXISTS idx_admissions_applicant_nocase ON admissions(applicant_name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_admissions_id_nocase ON admissions(id COLLATE NOCASE);
+
+CREATE INDEX IF NOT EXISTS idx_pos_items_name_nocase ON pos_items(name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_pos_items_active_cat ON pos_items(is_active, category);
+
